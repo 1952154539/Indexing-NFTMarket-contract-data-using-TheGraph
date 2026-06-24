@@ -1,0 +1,16 @@
+# Compiler files
+cache/
+out/
+broadcast/
+
+# Environment
+.env
+
+# Dependencies
+node_modules/
+lib/
+
+# Subgraph
+subgraph/node_modules/
+subgraph/generated/
+subgraph/build/
