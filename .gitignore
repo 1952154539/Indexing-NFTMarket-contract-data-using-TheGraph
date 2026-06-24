@@ -16,3 +16,6 @@ subgraph/generated/
 subgraph/build/
 build/
 generated/
+
+# Screenshot intermediates
+screenshots/*.html

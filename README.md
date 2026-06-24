@@ -117,6 +117,8 @@ The following transactions were executed on Sepolia to generate real events for 
 
 ### Query 1: Get All Listings
 
+![Query 1 Screenshot](./screenshots/query1.png)
+
 ```graphql
 {
   lists(first: 10, orderBy: blockTimestamp, orderDirection: desc) {
@@ -171,6 +173,8 @@ The following transactions were executed on Sepolia to generate real events for 
 
 ### Query 2: Get Sold Records with Listing Details (Relational Query)
 
+![Query 2 Screenshot](./screenshots/query2.png)
+
 ```graphql
 {
   solds(first: 10, orderBy: blockTimestamp, orderDirection: desc) {
@@ -221,6 +225,8 @@ The following transactions were executed on Sepolia to generate real events for 
 
 ### Query 3: Get Cancelled Listings
 
+![Query 3 Screenshot](./screenshots/query3.png)
+
 ```graphql
 {
   lists(
@@ -259,6 +265,8 @@ The following transactions were executed on Sepolia to generate real events for 
 ```
 
 ### Query 4: Single Listing Detail
+
+![Query 4 Screenshot](./screenshots/query4.png)
 
 ```graphql
 {
