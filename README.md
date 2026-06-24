@@ -9,11 +9,11 @@ This project demonstrates how to use [TheGraph](https://thegraph.com/) to index 
 
 ## Deployed Contracts (Sepolia Testnet)
 
-| Contract   | Address                                      |
-| ---------- | -------------------------------------------- |
-| BaseERC20  | `0x55fA4367AD41290bc58425304901B619F127F069` |
-| SimpleNFT  | `0x25398bE0969E925fA9b554fA3042c5508E8F7873` |
-| NFTMarket  | `0xacc4e3E1dd37Fab686Ba9aEAA243882a88C52d37` |
+| Contract   | Address                                      | Etherscan |
+| ---------- | -------------------------------------------- | --------- |
+| BaseERC20  | `0x55fA4367AD41290bc58425304901B619F127F069` | [Link](https://sepolia.etherscan.io/address/0x55fA4367AD41290bc58425304901B619F127F069#code) |
+| SimpleNFT  | `0x25398bE0969E925fA9b554fA3042c5508E8F7873` | [Link](https://sepolia.etherscan.io/address/0x25398bE0969E925fA9b554fA3042c5508E8F7873#code) |
+| NFTMarket  | `0xacc4e3E1dd37Fab686Ba9aEAA243882a88C52d37` | [Link](https://sepolia.etherscan.io/address/0xacc4e3E1dd37Fab686Ba9aEAA243882a88C52d37#code) |
 
 ## Smart Contract
 
