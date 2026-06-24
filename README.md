@@ -94,9 +94,22 @@ The subgraph maps three contract events to entity operations:
 
 This establishes a one-to-one relationship: each `Sold` record links back to its originating `List`.
 
+## On-Chain Test Data
+
+The following transactions were executed on Sepolia to generate real events for TheGraph indexing:
+
+| # | Action | Tx Hash | Block |
+|---|--------|---------|-------|
+| 1 | **List** #0 (0.01 ETH) | `0x692ecd...01e80d` | [11127519](https://sepolia.etherscan.io/tx/0x692ecd0e124dbb2513e4460c381ab1a7d008f18b9e713c01db77513c9901e80d) |
+| 2 | **Cancel** #0 | `0xd87b70...e8bc6` | [11127521](https://sepolia.etherscan.io/tx/0xd87b70e1071dac1a20cdb9bd9387a2957eda57d9488c86990e6c188f7aee8bc6) |
+| 3 | **List** #1 (0.005 ETH) | `0xa65db0...06f1` | [11127524](https://sepolia.etherscan.io/tx/0xa65db05beeda3c025c2afde057da8134fe2e5ba6b522acded2588b1c580e06f1) |
+| 4 | **Sold** #1 | `0xf73673...f005` | [11127528](https://sepolia.etherscan.io/tx/0xf73673bd5845841b19cca3d907f03c3fcc44d23d42131889a2adf826377af005) |
+
 ## TheGraph Query Examples
 
-### Query 1: Get All Active Listings
+> After the subgraph syncs, the following queries will return the on-chain data shown above.
+
+### Query 1: Get All Listings
 
 ```graphql
 {
@@ -109,12 +122,48 @@ This establishes a one-to-one relationship: each `Sold` record links back to its
     payToken
     price
     deadline
-    blockTimestamp
+    cancelTxHash
+    filledTxHash
   }
 }
 ```
 
-### Query 2: Get Sold Records with Listing Details
+**Expected Result:**
+
+```json
+{
+  "data": {
+    "lists": [
+      {
+        "id": "0x0000000000000000000000000000000000000000000000000000000000000001",
+        "nft": "0x25398be0969e925fa9b554fa3042c5508e8f7873",
+        "tokenId": "1",
+        "tokenURL": "https://ipfs.io/ipfs/QmTest2",
+        "seller": "0xc7a263b1205226158b7a5f8aa8fdbaae9c15a55d",
+        "payToken": "0x0000000000000000000000000000000000000000",
+        "price": "5000000000000000",
+        "deadline": "1782880289",
+        "cancelTxHash": "0x0000000000000000000000000000000000000000000000000000000000000000",
+        "filledTxHash": "0xf73673bd5845841b19cca3d907f03c3fcc44d23d42131889a2adf826377af005"
+      },
+      {
+        "id": "0x0000000000000000000000000000000000000000000000000000000000000000",
+        "nft": "0x25398be0969e925fa9b554fa3042c5508e8f7873",
+        "tokenId": "1",
+        "tokenURL": "https://ipfs.io/ipfs/QmTest2",
+        "seller": "0xc7a263b1205226158b7a5f8aa8fdbaae9c15a55d",
+        "payToken": "0x0000000000000000000000000000000000000000",
+        "price": "10000000000000000",
+        "deadline": "1782880016",
+        "cancelTxHash": "0xd87b70e1071dac1a20cdb9bd9387a2957eda57d9488c86990e6c188f7aee8bc6",
+        "filledTxHash": "0x0000000000000000000000000000000000000000000000000000000000000000"
+      }
+    ]
+  }
+}
+```
+
+### Query 2: Get Sold Records with Listing Details (Relational Query)
 
 ```graphql
 {
@@ -137,7 +186,34 @@ This establishes a one-to-one relationship: each `Sold` record links back to its
 }
 ```
 
-### Query 3: Get Listings Cancelled After Being Created
+**Expected Result:**
+
+```json
+{
+  "data": {
+    "solds": [
+      {
+        "id": "0x0000000000000000000000000000000000000000000000000000000000000001",
+        "buyer": "0xe6d606709241c6927d0a2270e098262a657bfacc",
+        "fee": "125000000000000",
+        "blockTimestamp": "1769055512",
+        "transactionHash": "0xf73673bd5845841b19cca3d907f03c3fcc44d23d42131889a2adf826377af005",
+        "list": {
+          "id": "0x0000000000000000000000000000000000000000000000000000000000000001",
+          "nft": "0x25398be0969e925fa9b554fa3042c5508e8f7873",
+          "tokenId": "1",
+          "tokenURL": "https://ipfs.io/ipfs/QmTest2",
+          "seller": "0xc7a263b1205226158b7a5f8aa8fdbaae9c15a55d",
+          "price": "5000000000000000",
+          "payToken": "0x0000000000000000000000000000000000000000"
+        }
+      }
+    ]
+  }
+}
+```
+
+### Query 3: Get Cancelled Listings
 
 ```graphql
 {
@@ -156,37 +232,31 @@ This establishes a one-to-one relationship: each `Sold` record links back to its
 }
 ```
 
-### Query 4: Get Full Listing Lifecycle (Listed -> Sold)
+**Expected Result:**
 
-```graphql
+```json
 {
-  solds(first: 5, orderBy: blockTimestamp, orderDirection: desc) {
-    id
-    buyer
-    fee
-    blockTimestamp
-    transactionHash
-    list {
-      id
-      nft
-      tokenId
-      tokenURL
-      seller
-      price
-      payToken
-      deadline
-      blockTimestamp
-      transactionHash
-    }
+  "data": {
+    "lists": [
+      {
+        "id": "0x0000000000000000000000000000000000000000000000000000000000000000",
+        "nft": "0x25398be0969e925fa9b554fa3042c5508e8f7873",
+        "tokenId": "1",
+        "price": "10000000000000000",
+        "seller": "0xc7a263b1205226158b7a5f8aa8fdbaae9c15a55d",
+        "cancelTxHash": "0xd87b70e1071dac1a20cdb9bd9387a2957eda57d9488c86990e6c188f7aee8bc6",
+        "blockTimestamp": "1769055428"
+      }
+    ]
   }
 }
 ```
 
-### Query 5: Get a Specific Listing by ID
+### Query 4: Get Full Listing Lifecycle
 
 ```graphql
 {
-  list(id: "0x0") {
+  list(id: "0x0000000000000000000000000000000000000000000000000000000000000001") {
     id
     nft
     tokenId
@@ -204,12 +274,40 @@ This establishes a one-to-one relationship: each `Sold` record links back to its
 }
 ```
 
-## Query Screenshots
+**Expected Result (List #1: Listed → Sold):**
 
-_(Add TheGraph playground screenshots here showing query results)_
+```json
+{
+  "data": {
+    "list": {
+      "id": "0x0000000000000000000000000000000000000000000000000000000000000001",
+      "nft": "0x25398be0969e925fa9b554fa3042c5508e8f7873",
+      "tokenId": "1",
+      "tokenURL": "https://ipfs.io/ipfs/QmTest2",
+      "seller": "0xc7a263b1205226158b7a5f8aa8fdbaae9c15a55d",
+      "payToken": "0x0000000000000000000000000000000000000000",
+      "price": "5000000000000000",
+      "deadline": "1782880289",
+      "blockNumber": "11127524",
+      "blockTimestamp": "1769055464",
+      "transactionHash": "0xa65db05beeda3c025c2afde057da8134fe2e5ba6b522acded2588b1c580e06f1",
+      "cancelTxHash": "0x0000000000000000000000000000000000000000000000000000000000000000",
+      "filledTxHash": "0xf73673bd5845841b19cca3d907f03c3fcc44d23d42131889a2adf826377af005"
+    }
+  }
+}
+```
 
-![Query Example 1](./screenshots/query1-listings.png)
-![Query Example 2](./screenshots/query2-solds.png)
+### Data Relationship Diagram
+
+```
+List #0 ── canceled ── cancelTxHash = 0xd87b70...e8bc6
+List #1 ── sold ──→ Sold #1
+                     │  buyer: 0xe6D6...bfacC
+                     │  fee:   0.000125 ETH (2.5%)
+                     │
+                     └── list → List #1 (reverse relation)
+```
 
 ## Project Structure
 
