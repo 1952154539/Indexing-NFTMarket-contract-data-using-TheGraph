@@ -94,6 +94,11 @@ The subgraph maps three contract events to entity operations:
 
 This establishes a one-to-one relationship: each `Sold` record links back to its originating `List`.
 
+## TheGraph Subgraph (Deployed)
+
+- **Subgraph URL**: [thegraph.com/studio/subgraph/nftmarket-sepolia](https://thegraph.com/studio/subgraph/nftmarket-sepolia)
+- **Query Endpoint**: `https://api.studio.thegraph.com/query/1755602/nftmarket-sepolia/v0.0.2`
+
 ## On-Chain Test Data
 
 The following transactions were executed on Sepolia to generate real events for TheGraph indexing:
@@ -107,7 +112,7 @@ The following transactions were executed on Sepolia to generate real events for 
 
 ## TheGraph Query Examples
 
-> After the subgraph syncs, the following queries will return the on-chain data shown above.
+> Run these queries in the [TheGraph Playground](https://thegraph.com/studio/subgraph/nftmarket-sepolia/playground) to see live results.
 
 ### Query 1: Get All Listings
 
@@ -128,35 +133,23 @@ The following transactions were executed on Sepolia to generate real events for 
 }
 ```
 
-**Expected Result:**
+**Live Result (from subgraph API):**
 
 ```json
 {
   "data": {
     "lists": [
       {
-        "id": "0x0000000000000000000000000000000000000000000000000000000000000001",
-        "nft": "0x25398be0969e925fa9b554fa3042c5508e8f7873",
-        "tokenId": "1",
-        "tokenURL": "https://ipfs.io/ipfs/QmTest2",
-        "seller": "0xc7a263b1205226158b7a5f8aa8fdbaae9c15a55d",
-        "payToken": "0x0000000000000000000000000000000000000000",
-        "price": "5000000000000000",
-        "deadline": "1782880289",
-        "cancelTxHash": "0x0000000000000000000000000000000000000000000000000000000000000000",
-        "filledTxHash": "0xf73673bd5845841b19cca3d907f03c3fcc44d23d42131889a2adf826377af005"
-      },
-      {
-        "id": "0x0000000000000000000000000000000000000000000000000000000000000000",
+        "id": "0x00",
         "nft": "0x25398be0969e925fa9b554fa3042c5508e8f7873",
         "tokenId": "1",
         "tokenURL": "https://ipfs.io/ipfs/QmTest2",
         "seller": "0xc7a263b1205226158b7a5f8aa8fdbaae9c15a55d",
         "payToken": "0x0000000000000000000000000000000000000000",
         "price": "10000000000000000",
-        "deadline": "1782880016",
-        "cancelTxHash": "0xd87b70e1071dac1a20cdb9bd9387a2957eda57d9488c86990e6c188f7aee8bc6",
-        "filledTxHash": "0x0000000000000000000000000000000000000000000000000000000000000000"
+        "deadline": "1782880034",
+        "cancelTxHash": "0x00000000",
+        "filledTxHash": "0x00000000"
       }
     ]
   }
@@ -186,20 +179,19 @@ The following transactions were executed on Sepolia to generate real events for 
 }
 ```
 
-**Expected Result:**
+**Expected Result (after full sync):**
 
 ```json
 {
   "data": {
     "solds": [
       {
-        "id": "0x0000000000000000000000000000000000000000000000000000000000000001",
+        "id": "0x01",
         "buyer": "0xe6d606709241c6927d0a2270e098262a657bfacc",
         "fee": "125000000000000",
-        "blockTimestamp": "1769055512",
         "transactionHash": "0xf73673bd5845841b19cca3d907f03c3fcc44d23d42131889a2adf826377af005",
         "list": {
-          "id": "0x0000000000000000000000000000000000000000000000000000000000000001",
+          "id": "0x01",
           "nft": "0x25398be0969e925fa9b554fa3042c5508e8f7873",
           "tokenId": "1",
           "tokenURL": "https://ipfs.io/ipfs/QmTest2",
@@ -218,7 +210,7 @@ The following transactions were executed on Sepolia to generate real events for 
 ```graphql
 {
   lists(
-    where: { cancelTxHash_not: "0x0000000000000000000000000000000000000000000000000000000000000000" }
+    where: { cancelTxHash_not: "0x00000000" }
     first: 10
   ) {
     id
@@ -232,14 +224,14 @@ The following transactions were executed on Sepolia to generate real events for 
 }
 ```
 
-**Expected Result:**
+**Expected Result (after full sync):**
 
 ```json
 {
   "data": {
     "lists": [
       {
-        "id": "0x0000000000000000000000000000000000000000000000000000000000000000",
+        "id": "0x00",
         "nft": "0x25398be0969e925fa9b554fa3042c5508e8f7873",
         "tokenId": "1",
         "price": "10000000000000000",
@@ -252,61 +244,23 @@ The following transactions were executed on Sepolia to generate real events for 
 }
 ```
 
-### Query 4: Get Full Listing Lifecycle
-
-```graphql
-{
-  list(id: "0x0000000000000000000000000000000000000000000000000000000000000001") {
-    id
-    nft
-    tokenId
-    tokenURL
-    seller
-    payToken
-    price
-    deadline
-    blockNumber
-    blockTimestamp
-    transactionHash
-    cancelTxHash
-    filledTxHash
-  }
-}
-```
-
-**Expected Result (List #1: Listed → Sold):**
-
-```json
-{
-  "data": {
-    "list": {
-      "id": "0x0000000000000000000000000000000000000000000000000000000000000001",
-      "nft": "0x25398be0969e925fa9b554fa3042c5508e8f7873",
-      "tokenId": "1",
-      "tokenURL": "https://ipfs.io/ipfs/QmTest2",
-      "seller": "0xc7a263b1205226158b7a5f8aa8fdbaae9c15a55d",
-      "payToken": "0x0000000000000000000000000000000000000000",
-      "price": "5000000000000000",
-      "deadline": "1782880289",
-      "blockNumber": "11127524",
-      "blockTimestamp": "1769055464",
-      "transactionHash": "0xa65db05beeda3c025c2afde057da8134fe2e5ba6b522acded2588b1c580e06f1",
-      "cancelTxHash": "0x0000000000000000000000000000000000000000000000000000000000000000",
-      "filledTxHash": "0xf73673bd5845841b19cca3d907f03c3fcc44d23d42131889a2adf826377af005"
-    }
-  }
-}
-```
-
 ### Data Relationship Diagram
 
 ```
-List #0 ── canceled ── cancelTxHash = 0xd87b70...e8bc6
-List #1 ── sold ──→ Sold #1
-                     │  buyer: 0xe6D6...bfacC
-                     │  fee:   0.000125 ETH (2.5%)
-                     │
-                     └── list → List #1 (reverse relation)
+List #0 ("0x00") ── canceled ── cancelTxHash = 0xd87b70...e8bc6
+List #1 ("0x01") ── sold ──→ Sold #1 ("0x01")
+                              │  buyer: 0xe6D6...bfacC
+                              │  fee:   0.000125 ETH (2.5%)
+                              │
+                              └── list → List #1 (reverse relation)
+```
+
+### Query via curl
+
+```bash
+curl -X POST https://api.studio.thegraph.com/query/1755602/nftmarket-sepolia/v0.0.2 \
+  -H "Content-Type: application/json" \
+  -d '{"query":"{ lists(first: 5) { id nft tokenId tokenURL seller payToken price deadline cancelTxHash filledTxHash } }"}'
 ```
 
 ## Project Structure

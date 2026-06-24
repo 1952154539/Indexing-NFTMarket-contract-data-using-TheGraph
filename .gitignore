@@ -14,3 +14,4 @@ lib/
 subgraph/node_modules/
 subgraph/generated/
 subgraph/build/
+build/
